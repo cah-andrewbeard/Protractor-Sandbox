@@ -50,57 +50,49 @@ var NotificationsMenu = function(){
 
 };
 
-describe('Login VALID ID, INVALID PASSWORD', function(){
-  it('Login should FAIL to authenticate', function(){
-    var hawkeyeLogin = new HawkeyeLogin();
+describe('Logins Invalid', function(){
+  var hawkeyeLogin;
+
+  beforeEach(function() {
+    hawkeyeLogin = new HawkeyeLogin();
     hawkeyeLogin.loginPage();
+  });
+
+  it('invalid password', function(){
     hawkeyeLogin.inputCredentials('protractor.test','INVALID');
     hawkeyeLogin.initiateLogin();
     expect(browser.getCurrentUrl()).toEqual(loginURL);
     expect(hawkeyeLogin.didAuthFail()).toBe(true);
   });
-});
 
-describe('Login INVALID ID, INVALID PASSWORD', function(){
-  it('Login should FAIL to authenticate', function(){
-    var hawkeyeLogin = new HawkeyeLogin();
-    hawkeyeLogin.loginPage();
+  it('invalid password and id', function(){
     hawkeyeLogin.inputCredentials('INVALID.ID','INVALID');
     hawkeyeLogin.initiateLogin();
     expect(browser.getCurrentUrl()).toEqual(loginURL);
     expect(hawkeyeLogin.didAuthFail()).toBe(true);
   });
-});
 
-describe('Login INVALID ID, VALID PASSWORD', function(){
-  it('Login should FAIL to authenticate', function(){
-    var hawkeyeLogin = new HawkeyeLogin();
-    hawkeyeLogin.loginPage();
+  it('invalid id', function(){
     hawkeyeLogin.inputCredentials('INVALID.ID','password');
     hawkeyeLogin.initiateLogin();
     expect(browser.getCurrentUrl()).toEqual(loginURL);
     expect(hawkeyeLogin.didAuthFail()).toBe(true);
   });
-});
 
-describe('Login EMPTY FIELDS', function(){
   it('Login should FAIL to authenticate', function(){
-    var hawkeyeLogin = new HawkeyeLogin();
-    hawkeyeLogin.loginPage();
+
     hawkeyeLogin.inputCredentials('','');
     hawkeyeLogin.initiateLogin();
     expect(browser.getCurrentUrl()).toEqual(loginURL);
   });
-});
 
-describe('Login VALID ID, VALID PASSWORD', function(){
   it('Login successfully', function(){
-    var hawkeyeLogin = new HawkeyeLogin();
-    hawkeyeLogin.loginPage();
+
     hawkeyeLogin.inputCredentials('protractor.test','password');
     hawkeyeLogin.initiateLogin();
     expect(browser.getCurrentUrl()).toEqual(zeroStateURL);
   });
+
 });
 
 describe('Notifications: open statsus filter', function(){
@@ -109,7 +101,6 @@ describe('Notifications: open statsus filter', function(){
     notificationsMenu.selectStatusFilter();
 
   });
-
 });
 
 
