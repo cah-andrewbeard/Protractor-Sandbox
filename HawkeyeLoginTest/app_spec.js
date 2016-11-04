@@ -1,108 +1,63 @@
-
 //this slows down the browser so it can be followed visually
-
-var origFn = browser.driver.controlFlow().execute;
-
-browser.driver.controlFlow().execute = function() {
-  var args = arguments;
-
-  // queue 100ms wait
-  origFn.call(browser.driver.controlFlow(), function() {
-    return protractor.promise.delayed(100);
+describe('Protractor Test', function () {
+  beforeEach(function () {
+    this.listOfStuff = Object.create(ListOfStuff);
+    var hawkeyeLogin = new listOfStuff.HawkeyeLogin();
+    var notificationsMenu = new listOfStuff.NotificationsMenu();
   });
 
-  return origFn.apply(browser.driver.controlFlow(), args);
-};
+  describe('Logins Invalid', function() {
 
-var loginURL = 'https://munge.dev.cahcommtech.com/#!/login';
-var zeroStateURL = 'https://munge.dev.cahcommtech.com/#!/file/';
+      beforeEach(function() {
 
-var HawkeyeLogin = function() {
-  var usernameInput = element(by.model('userName'));
-  var passwordInput = element(by.model('password'));
-  var submitButton = element(by.className('hawkeye-button'));
-  var authFailure = element(by.className('authentication-failed'));
-  this.loginPage = function() {
-    browser.get(loginURL);
-  };
+          hawkeyeLogin.loginPage();
+      });
 
-  this.inputCredentials = function(username, password) {
-    usernameInput.sendKeys(username);
-    passwordInput.sendKeys(password);
-  };
+      it('invalid password', function() {
+          hawkeyeLogin.inputCredentials('protractor.test', 'INVALID');
+          hawkeyeLogin.initiateLogin();
+          expect(browser.getCurrentUrl()).toEqual(loginURL);
+          expect(hawkeyeLogin.didAuthFail()).toBe(true);
+      });
 
-  this.initiateLogin = function() {
-    submitButton.click();
-  };
+      it('invalid password and id', function() {
+          hawkeyeLogin.inputCredentials('INVALID.ID', 'INVALID');
+          hawkeyeLogin.initiateLogin();
+          expect(browser.getCurrentUrl()).toEqual(loginURL);
+          expect(hawkeyeLogin.didAuthFail()).toBe(true);
+      });
 
-  this.didAuthFail = function(){
-    return authFailure.isDisplayed();
-  };
+      it('invalid id', function() {
+          hawkeyeLogin.inputCredentials('INVALID.ID', 'password');
+          hawkeyeLogin.initiateLogin();
+          expect(browser.getCurrentUrl()).toEqual(loginURL);
+          expect(hawkeyeLogin.didAuthFail()).toBe(true);
+      });
 
-};
+      it('Login should FAIL to authenticate', function() {
 
-var NotificationsMenu = function(){
-  var statusFilter = element(by.id('notification-filter-btn'));
+          hawkeyeLogin.inputCredentials('', '');
+          hawkeyeLogin.initiateLogin();
+          expect(browser.getCurrentUrl()).toEqual(loginURL);
+      });
 
-  this.selectStatusFilter = function() {
-    statusFilter.click();
-  };
+      it('Login successfully', function() {
 
-};
+          hawkeyeLogin.inputCredentials('protractor.test', 'password');
+          hawkeyeLogin.initiateLogin();
+          expect(browser.getCurrentUrl()).toEqual(zeroStateURL);
+      });
 
-describe('Logins Invalid', function(){
-  var hawkeyeLogin;
-
-  beforeEach(function() {
-    hawkeyeLogin = new HawkeyeLogin();
-    hawkeyeLogin.loginPage();
   });
 
-  it('invalid password', function(){
-    hawkeyeLogin.inputCredentials('protractor.test','INVALID');
-    hawkeyeLogin.initiateLogin();
-    expect(browser.getCurrentUrl()).toEqual(loginURL);
-    expect(hawkeyeLogin.didAuthFail()).toBe(true);
-  });
+  describe('Notifications: open statsus filter', function() {
+      it('should open status filter dropdown', function() {
+          var notificationsMenu = new NotificationsMenu();
+          notificationsMenu.selectStatusFilter();
 
-  it('invalid password and id', function(){
-    hawkeyeLogin.inputCredentials('INVALID.ID','INVALID');
-    hawkeyeLogin.initiateLogin();
-    expect(browser.getCurrentUrl()).toEqual(loginURL);
-    expect(hawkeyeLogin.didAuthFail()).toBe(true);
-  });
-
-  it('invalid id', function(){
-    hawkeyeLogin.inputCredentials('INVALID.ID','password');
-    hawkeyeLogin.initiateLogin();
-    expect(browser.getCurrentUrl()).toEqual(loginURL);
-    expect(hawkeyeLogin.didAuthFail()).toBe(true);
-  });
-
-  it('Login should FAIL to authenticate', function(){
-
-    hawkeyeLogin.inputCredentials('','');
-    hawkeyeLogin.initiateLogin();
-    expect(browser.getCurrentUrl()).toEqual(loginURL);
-  });
-
-  it('Login successfully', function(){
-
-    hawkeyeLogin.inputCredentials('protractor.test','password');
-    hawkeyeLogin.initiateLogin();
-    expect(browser.getCurrentUrl()).toEqual(zeroStateURL);
-  });
-
-});
-
-describe('Notifications: open statsus filter', function(){
-  it('should open status filter dropdown', function(){
-    var notificationsMenu = new NotificationsMenu();
-    notificationsMenu.selectStatusFilter();
-
+      });
   });
 });
-
 
 // describe('Hawkeye Login Protractor Demo', function() {
 //   it('valid login', function() {
